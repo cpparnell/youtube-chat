@@ -1,5 +1,8 @@
 # youtube-chat
-Summarize YouTube videos and ask questions.
+
+Get YouTube video summaries, then chat about the video with a GPT. 
+
+Using GPT-4 and Whisper from OpenAI.
 
 **Currently only works on MacOS**
 
@@ -10,7 +13,20 @@ Install Certificates
 2. Run the "Install Certificates.command" script.
 
 Install ffmpeg:
-Run in terminal: brew install ffmpeg
+```
+brew install ffmpeg
+```
+Install openai:
+```
+pip install openai
+```
 
 OpenAI API key:
 Run in terminal: export OPENAI_API_KEY='your_api_key'
+
+## How to Use
+
+To get the summary of a YouTube video and chat about it with a gpt, run:
+```
+python main.py
+```

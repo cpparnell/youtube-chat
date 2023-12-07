@@ -7,6 +7,7 @@ import re
 from .exceptions import InvalidYouTubeUrlError
 
 openai.api_key = os.environ['OPENAI_API_KEY']
+client = openai.OpenAI()
 
 class AudioDownloader:
     def is_youtube_video_url(url: str) -> bool:
@@ -48,12 +49,12 @@ class OpenAIAssistantManager:
     
     def __init__(self, path: str, filename: str) -> None:
         self.assistant = self.__create_assistant(path, filename)
-        self.thread = openai.beta.threads.create()
-    
+        self.thread = client.beta.threads.create()
+        
     def __create_assistant(self, path: str, filename: str): # creates Assistant
         # create FileObject from transcription
         file = openai.files.create(file=open(os.path.join(path, filename), 'rb'), purpose='assistants')
-        response = openai.beta.assistants.create(
+        response = client.beta.assistants.create(
             name="Domain Expert",
             instructions="You are a an expert on the topic described in the attached video transcription. Be prepared to summarize and answer questions about the subject matter based on the transcription. Your answers should be SHORT and INFORMATIVE. Do NOT answer any questions that are not directly related to the transcription.",
             tools=[{"type": "retrieval"}],
@@ -63,10 +64,32 @@ class OpenAIAssistantManager:
         return response
 
     def create_summary(self):
-        message = openai.beta.threads.messages.create(thread_id=self.thread.id,role="user",content="Please create a succint 1 paragraph summary of the provided transcription. Refer to the transcription as if it is a video.")
-        run = openai.beta.threads.runs.create(thread_id=self.thread.id, assistant_id=self.assistant.id)
+        message = client.beta.threads.messages.create(thread_id=self.thread.id,role="user",content="Please create a succint 1 paragraph summary of the provided transcription. Refer to the transcription as if it is a video.")
+        run = client.beta.threads.runs.create(thread_id=self.thread.id, assistant_id=self.assistant.id)
         while run.status != 'completed':
-            run = openai.beta.threads.runs.retrieve(thread_id=self.thread.id, run_id=run.id)
-        messages = openai.beta.threads.messages.list(thread_id=self.thread.id)
+            run = client.beta.threads.runs.retrieve(thread_id=self.thread.id, run_id=run.id)
+        messages = client.beta.threads.messages.list(thread_id=self.thread.id)
         return messages.data[0].content[0].text.value
     
+
+    def send_message(self, content: str) -> str:
+        """send message to assistant
+        """
+        message = client.beta.threads.messages.create(thread_id=self.thread.id, role="user", content=content)
+        run = client.beta.threads.runs.create(thread_id=self.thread.id, assistant_id=self.assistant.id)
+        while run.status != 'completed':
+            run = client.beta.threads.runs.retrieve(thread_id=self.thread.id, run_id=run.id)
+        return message
+
+    def get_response(self) -> str | None:
+        """get response to latest message
+        """
+        messages = client.beta.threads.messages.list(thread_id=self.thread.id)
+        return messages.data[0].content[0].text.value
+        # # Assuming the last message is the assistant's response
+        # messages = response['data']
+        # if messages:
+        #     last_message = messages[-1]
+        #     if last_message['role'] == 'assistant':
+        #         return last_message['content']
+        # return None
