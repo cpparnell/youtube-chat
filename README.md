@@ -4,8 +4,6 @@ Get YouTube video summaries, then chat about the video with a GPT.
 
 Using GPT-4 and Whisper from OpenAI.
 
-**Currently only works on MacOS**
-
 ## Setup
 
 Install Certificates
@@ -16,7 +14,7 @@ Install ffmpeg:
 ```
 brew install ffmpeg
 ```
-Installations:
+Python Package Installations:
 ```
 pip install openai whisper pytube
 ```
