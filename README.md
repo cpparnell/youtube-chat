@@ -16,9 +16,9 @@ Install ffmpeg:
 ```
 brew install ffmpeg
 ```
-Install openai:
+Installations:
 ```
-pip install openai
+pip install openai whisper pytube
 ```
 
 OpenAI API key:
