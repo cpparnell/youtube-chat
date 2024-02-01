@@ -2,6 +2,8 @@
 
 Get YouTube video summaries, then chat about the video with a GPT. 
 
+Video transcription is quite slow when running locally (as expected).
+
 Using GPT-4 and Whisper from OpenAI.
 
 ## Setup
